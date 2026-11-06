@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoLocal – Earn local. Help local.</title>
+<meta name="description" content="GoLocal connects people who need a hand with neighbours who can help. Post a job for 24 hours, or an Insta Job for 10 minutes, and message the right person nearby.">
+<meta name="theme-color" content="#F97415">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📍</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Tokens (taken from the app's color.dart) ===== */
+:root{
+  --orange:#F97415; --orange-soft:#FFF1E7;
+  --green:#53BD41;  --green-soft:#EEF8EB;
+  --slate:#344256;  --yellow:#FBC851;
+  --cream:#F3EEE2;  --line:#E0E0E0; --ink:#1F2630; --muted:#6B7280;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --wrap:1120px;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font-family:var(--body);color:var(--ink);background:var(--cream);line-height:1.6;font-size:17px;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--slate);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--display);line-height:1.08;letter-spacing:-.02em;color:var(--slate)}
+h2{font-size:clamp(30px,4.4vw,46px);font-weight:800;max-width:18ch}
+h3{font-size:22px;font-weight:600}
+p.lead{font-size:19px;color:#4b5563;max-width:46ch}
+section{padding:88px 0}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:12px;font-weight:600;text-decoration:none;border:2px solid transparent;transition:transform .15s,background .15s}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:#e0620a;transform:translateY(-1px)}
+.btn-ghost{border-color:var(--slate);color:var(--slate)}
+.btn-ghost:hover{background:var(--slate);color:#fff}
+
+/* ===== Header ===== */
+header{position:sticky;top:0;z-index:20;background:rgba(243,238,226,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:24px;color:var(--orange)}
+.brand svg{width:28px;height:32px}
+nav{display:flex;gap:28px;align-items:center}
+nav a:not(.btn){text-decoration:none;font-weight:500;color:var(--slate)}
+nav a:not(.btn):hover{color:var(--orange)}
+nav .btn{padding:9px 18px}
+@media(max-width:760px){nav a:not(.btn){display:none}}
+
+/* ===== Hero ===== */
+.hero{padding:64px 0 88px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(46px,8vw,92px);font-weight:800;letter-spacing:-.035em}
+.hero h1 span{display:block}
+.hero h1 .help{color:var(--orange)}
+.hero p.lead{margin:24px 0 32px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.hero small{display:block;margin-top:18px;color:var(--muted);font-size:14px}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}.hero{padding-top:40px}}
+
+/* ===== Phone frame + app UI replicas ===== */
+.phone{width:320px;max-width:100%;margin:0 auto;background:#fff;border:10px solid var(--slate);border-radius:40px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(52,66,86,.45)}
+.phone .screen{min-height:560px;height:auto;display:flex;flex-direction:column;background:var(--cream);position:relative}
+.appbar{background:#fff;padding:14px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.appbar b{font-family:var(--display);font-size:19px;color:var(--ink);display:block;line-height:1.1}
+.appbar small{font-size:11.5px;color:var(--slate)}
+.appbar .loc{font-size:12px;font-weight:600;color:var(--slate);white-space:nowrap}
+.live{display:inline-block;background:#F44336;color:#fff;font-size:9px;font-weight:600;letter-spacing:.08em;padding:2px 8px;border-radius:10px;margin-left:4px;vertical-align:middle}
+.list{padding:12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;position:relative;overflow:hidden}
+.card .bar{position:absolute;left:0;top:0;height:3px;background:var(--green);transition:width 1s linear}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.card .top>*{min-width:0}
+.card .t{overflow-wrap:anywhere}
+.card .tag,.card .timer{flex-shrink:0;white-space:nowrap}
+.card .t{font-weight:600;color:var(--slate);font-size:15px}
+.card .d{font-size:12px;color:var(--muted)}
+.card .mid{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted)}
+.price{color:var(--green);font-weight:700;font-size:15px}
+.timer{color:var(--orange);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+.tag{background:var(--yellow);color:#111;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px}
+.msg{background:var(--orange);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:14px}
+.tabbar{background:#fafafa;border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:flex-end;padding:10px 4px 12px;font-size:10px;color:#9ca3af;white-space:nowrap;gap:2px}
+.tabbar .on{color:var(--orange);font-weight:600}
+.tabbar .plus{width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;font-size:24px;display:grid;place-items:center;margin-top:-18px;line-height:1}
+.expired{opacity:.35}
+
+/* ===== Two speeds ===== */
+.speeds{background:#fff}
+.speeds-head{display:flex;justify-content:space-between;gap:32px;align-items:flex-end;flex-wrap:wrap;margin-bottom:48px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{border-radius:24px;padding:36px;border:2px solid}
+.panel.normal{background:var(--orange-soft);border-color:var(--orange)}
+.panel.insta{background:var(--green-soft);border-color:var(--green)}
+.panel .big{font-family:var(--display);font-weight:800;font-size:clamp(56px,9vw,104px);line-height:.95;letter-spacing:-.04em}
+.panel.normal .big,.panel.normal h3{color:var(--orange)}
+.panel.insta .big,.panel.insta h3{color:#3d9a2d}
+.panel .unit{font-size:18px;font-weight:600;color:var(--slate);margin:4px 0 18px}
+.panel p{max-width:34ch;color:#4b5563}
+@media(max-width:760px){.panels{grid-template-columns:1fr}}
+
+/* ===== Steps ===== */
+.steps{list-style:none;padding:0;margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+.steps li{counter-increment:s;background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;margin-bottom:16px}
+.steps p{color:#4b5563;margin-top:8px;font-size:16px}
+@media(max-width:820px){.steps{grid-template-columns:1fr}}
+
+/* ===== Screens ===== */
+.screens{background:var(--slate);color:#fff}
+.screens h2{color:#fff}
+.screens p.lead{color:#cbd5e1}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:56px}
+.shot figcaption{text-align:center;margin-top:18px;color:#cbd5e1;font-size:15px}
+.shot .phone{border-color:#1f2937;width:300px}
+.shot .screen{min-height:520px}
+.bubble{max-width:78%;padding:9px 14px;font-size:13px;border-radius:18px 18px 0 18px;background:var(--orange);color:#1b1b1b;align-self:flex-end}
+.bubble.in{background:#fff;border-radius:18px 18px 18px 0;align-self:flex-start}
+.chat{padding:14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.input{margin:10px;display:flex;gap:8px;align-items:stretch}
+.input i{flex:1;background:var(--cream);border-radius:14px;padding:10px 14px;font-size:12px;color:#8a8a8a;font-style:normal}
+.input b{width:40px;min-height:38px;border-radius:12px;background:var(--orange)}
+.detail{background:#fff;margin:12px 12px 14px;flex:1;border:1px solid var(--line);border-radius:16px;padding:18px}
+.detail h4{font-family:var(--display);font-size:22px;color:var(--ink)}
+.detail .meta{font-size:13px;color:var(--muted);margin:10px 0 4px}
+.detail .meta em{color:var(--orange);font-style:normal}
+.cta-btn{margin:0 12px 16px;background:var(--orange);color:#fff;text-align:center;padding:13px;border-radius:14px;font-weight:600;font-size:14px}
+@media(max-width:900px){.shots{grid-template-columns:1fr;justify-items:center}}
+
+/* ===== Categories ===== */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+.chips button{font:inherit;font-size:15px;font-weight:500;padding:9px 18px;border-radius:999px;border:1.5px solid var(--slate);background:transparent;color:var(--slate);cursor:pointer;transition:background .15s,color .15s}
+.chips button:hover,.chips button[aria-pressed="true"]{background:var(--yellow);border-color:var(--yellow);color:#111}
+.examples{margin-top:28px;min-height:96px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 26px;max-width:640px}
+.examples b{font-family:var(--display);font-size:20px;color:var(--slate)}
+.examples ul{margin:10px 0 0 18px;color:#4b5563;font-size:16px}
+
+/* ===== Safety + FAQ ===== */
+.two{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr;gap:36px}}
+.safe{margin-top:24px;display:grid;gap:14px}
+.safe div{padding-left:18px;border-left:4px solid var(--green);color:#4b5563}
+.safe b{color:var(--slate);display:block}
+details{background:#fff;border:1px solid var(--line);border-radius:16px;padding:0 22px}
+details+details{margin-top:12px}
+summary{cursor:pointer;font-weight:600;color:var(--slate);padding:18px 0;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--orange);font-size:24px;line-height:1}
+details[open] summary::after{content:"–"}
+details p{padding-bottom:18px;color:#4b5563;font-size:16px}
+
+/* ===== Final CTA + footer ===== */
+.final{background:var(--orange);color:#fff;text-align:center;padding:96px 0}
+.final h2{color:#fff;margin:0 auto 18px;max-width:16ch}
+.final p{color:#fff;opacity:.92;margin:0 auto 32px;max-width:44ch;font-size:19px}
+.final .btn{background:#fff;color:var(--orange)}
+.final .btn:hover{background:var(--cream)}
+footer{background:var(--slate);color:#cbd5e1;padding:36px 0;font-size:15px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer a{text-decoration:none;margin-left:20px}
+footer a:hover{color:#fff;text-decoration:underline}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="GoLocal home">
+      <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2C10 2 3 9.5 3 19c0 12 17 25 17 25s17-13 17-25C37 9.5 30 2 20 2z" fill="#FBC851" stroke="#F97415" stroke-width="3"/><circle cx="20" cy="19" r="8" fill="#53BD41"/></svg>
+      GoLocal
+    </a>
+    <nav>
+      <a href="#speeds">Job types</a>
+      <a href="#how">How it works</a>
+      <a href="#app">The app</a>
+      <a href="#faq">Help</a>
+      <a class="btn btn-primary" href="#get">Get the app</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <h1><span>Earn local.</span><span class="help">Help local.</span></h1>
+      <p class="lead">Need a carpenter, a cleaner or someone to carry the sofa? Post the job, and people in your neighbourhood message you within minutes.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#get">Get the app</a>
+        <a class="btn btn-ghost" href="#how">See how it works</a>
+      </div>
+      <small>Built in Lucknow for neighbourhoods everywhere.</small>
+    </div>
+
+    <!-- Live Insta Jobs demo: cards count down like the real screen -->
+    <div class="phone" aria-label="Live demo of the Insta Jobs screen">
+      <div class="screen">
+        <div class="appbar">
+          <div><b>⚡ Insta Jobs <span class="live">LIVE</span></b><small>Grab them before they expire!</small></div>
+          <span class="loc">Lucknow ▾</span>
+        </div>
+        <div class="list" id="liveList"></div>
+        <div class="tabbar">
+          <span>Home</span><span class="on">Insta Jobs</span><span class="plus">+</span><span>Messages</span><span>Profile</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TWO SPEEDS ===== -->
+<section class="speeds" id="speeds">
+  <div class="wrap">
+    <div class="speeds-head">
+      <h2>Two ways to post a job</h2>
+      <p class="lead">Pick how fast you need help. You can change your mind for the next job.</p>
+    </div>
+    <div class="panels">
+      <article class="panel normal">
+        <div class="big">24</div>
+        <div class="unit">hours</div>
+        <h3>Normal Job</h3>
+        <p>For work that can wait a day: a home repair, a tuition, a painting quote. Your listing stays visible to everyone nearby.</p>
+      </article>
+      <article class="panel insta">
+        <div class="big">10</div>
+        <div class="unit">minutes</div>
+        <h3>Insta Job</h3>
+        <p>For urgent tasks. Your listing goes to the live Insta Jobs feed and disappears when the timer ends, so only people who are free right now reply.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how">
+  <div class="wrap">
+    <h2>From “I need help” to done</h2>
+    <ol class="steps">
+      <li><h3>Post it</h3><p>Add a title, category, short description, area and budget. Choose Normal or Insta. Quick Jobs fill in the common ones for you.</p></li>
+      <li><h3>Get messages</h3><p>Neighbours open your listing, see the area and budget, and tap Message Poster to talk details directly in the app.</p></li>
+      <li><h3>Get it done</h3><p>Agree on the work, finish the job, and keep your activity in one place on your profile.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== SCREENS ===== -->
+<section class="screens" id="app">
+  <div class="wrap">
+    <h2>Simple enough to use in a hurry</h2>
+    <p class="lead" style="margin-top:16px">One feed, one chat, one big plus button. Here is what you will see.</p>
+
+    <div class="shots">
+      <figure class="shot">
+        <div class="phone"><div class="screen">
+          <div class="appbar"><div><b style="color:var(--orange)">GoLocal</b><small>Earn local. Help local.</small></div><span class="loc">Lucknow ▾</span></div>
+          <div class="list">
+            <div class="card"><div class="top"><span class="t">Need carpenter</span><span class="tag">Plumbing</span></div><div class="d">service at home</div><div class="mid"><span>📍 omax city</span><span class="price">₹3810</span></div></div>
+            <div class="card"><div class="top"><span class="t">Washing machine repair</span><span class="tag">Cleaning</span></div><div class="d">experienced person</div><div class="mid"><span>📍 aliganj</span><span class="price">₹1316</span></div></div>
+            <div class="card"><div class="top"><span class="t">Need RO repair</span><span class="tag">Repair</span></div><div class="d">technician urgently</div><div class="mid"><span>📍 gomti nagar</span><span class="price">₹3941</span></div></div>
+          </div>
+          <div class="tabbar"><span class="on">Home</span><span>Insta Jobs</span><span class="plus">+</span><span>Messages</span><span>Profile</span></div>
+        </div></div>
+        <figcaption>Browse jobs near you and filter by category</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <div class="phone"><div class="screen">
+          <div class="appbar"><div><b>Job Details</b></div></div>
+          <div class="detail">
+            <h4>Need carpenter</h4>
+            <span class="tag">Plumbing</span>
+            <div class="meta">Posted by <em>Rahul G.</em></div>
+            <div class="meta">6 November 2026</div>
+            <div class="meta" style="margin-top:16px;color:var(--ink);font-weight:600">Description</div>
+            <div class="meta" style="margin:0">service at home</div>
+            <div class="mid" style="display:flex;justify-content:space-between;margin-top:18px;font-size:13px;color:var(--slate)"><span>📍 omax city, Lucknow</span><span class="price">₹3810</span></div>
+          </div>
+          <div class="cta-btn">💬 Message Poster</div>
+        </div></div>
+        <figcaption>See the details, then message the poster</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <div class="phone"><div class="screen">
+          <div class="appbar" style="align-items:center"><div style="display:flex;gap:10px;align-items:center"><span style="width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-weight:700">A</span><div><b style="font-size:15px">Aditya Hokar</b><small>Last Active: 2mo ago</small></div></div></div>
+          <div class="chat">
+            <div class="bubble">Hi, is the carpenter job still open?</div>
+            <div class="bubble in">Yes, can you come today?</div>
+            <div class="bubble in">Budget is fixed at ₹3810</div>
+            <div class="bubble">Works for me, see you at 5.</div>
+          </div>
+          <div class="input"><i>Type a message…</i><b></b></div>
+        </div></div>
+        <figcaption>Chat directly, then agree on the work</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CATEGORIES ===== -->
+<section id="categories">
+  <div class="wrap">
+    <h2>25 kinds of local work</h2>
+    <p class="lead" style="margin-top:16px">Tap a category to see the kind of jobs people post.</p>
+    <div class="chips" id="chips" role="group" aria-label="Job categories"></div>
+    <div class="examples" id="examples" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ===== SAFETY + FAQ ===== -->
+<section id="faq" style="background:#fff">
+  <div class="wrap two">
+    <div>
+      <h2>Stay safe while you earn</h2>
+      <div class="safe">
+        <div><b>Keep private details private</b>Never share your OTP, password or banking credentials with anyone.</div>
+        <div><b>Block anyone, any time</b>Open their profile and choose Block. Review blocked people from Profile &gt; Blocked.</div>
+        <div><b>Messages stay in the app</b>Talk about the job in GoLocal chat so you have a record of what was agreed.</div>
+      </div>
+    </div>
+    <div>
+      <details open><summary>How do I post a job on GoLocal?</summary><p>Tap Post, enter a title, category, description, area and budget, choose Normal Job or Insta Job, and post. Accurate details help people nearby understand what you need.</p></details>
+      <details><summary>How do I find someone to help with a job?</summary><p>Browse listings, narrow them with category filters, and open a listing to see its description, location and budget. Tap Message Poster to contact the person who posted it.</p></details>
+      <details><summary>What is the difference between Normal and Insta Jobs?</summary><p>Normal Jobs stay active for 24 hours. Insta Jobs stay active for 10 minutes and are meant for urgent tasks.</p></details>
+      <details><summary>What should I include when posting?</summary><p>A clear title, the closest category, a short description of the task, the area and your budget.</p></details>
+      <details><summary>How do I contact support?</summary><p>Email <a href="mailto:purpleincllp@gmail.com" style="color:var(--orange)">purpleincllp@gmail.com</a>. You can also read our <a href="https://mayankk-29.github.io/golocal-terms-privacy/" style="color:var(--orange)">Terms &amp; Privacy Policy</a>.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final" id="get">
+  <div class="wrap">
+    <h2>Your neighbourhood is hiring</h2>
+    <p>GoLocal is rolling out city by city, starting in Lucknow. Ask for early access and we will send you the link.</p>
+    <!-- Replace the href below with your Play Store / APK link when it is ready -->
+    <a class="btn" href="mailto:purpleincllp@gmail.com?subject=GoLocal%20early%20access">Ask for early access</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> GoLocal. Earn local. Help local.</span>
+    <span>
+      <a href="https://mayankk-29.github.io/golocal-terms-privacy/">Terms &amp; Privacy</a>
+      <a href="mailto:purpleincllp@gmail.com">Contact</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ---------- Live Insta Jobs demo ---------- */
+const pool=[
+  {t:"Need carpenter",d:"Need expert for quick work",a:"aliganj",p:846,c:"Painting"},
+  {t:"Need cleaner",d:"Need expert for quick work",a:"omax city",p:392,c:"Electrician"},
+  {t:"Need electrician",d:"Fan stopped working",a:"gomti nagar",p:520,c:"Repair"},
+  {t:"Medicine delivery",d:"Pick up from pharmacy",a:"hazratganj",p:150,c:"Delivery"},
+  {t:"Fix leaking tap",d:"Kitchen tap, needs a fix",a:"indira nagar",p:300,c:"Repair"},
+  {t:"Move heavy appliances",d:"Fridge to first floor",a:"mahanagar",p:700,c:"Moving"}
+];
+const list=document.getElementById("liveList"), TOTAL=600;
+let next=3, jobs=[];
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+function make(job,left){
+  const el=document.createElement("div");el.className="card";
+  el.innerHTML='<div class="bar"></div><div class="top"><span class="t"></span><span class="timer"></span></div><div class="d"></div><div class="mid"><span class="a"></span><span class="price"></span></div><div class="foot"><span class="tag"></span><span class="msg">Message</span></div>';
+  el.querySelector(".t").textContent=job.t;el.querySelector(".d").textContent=job.d;
+  el.querySelector(".a").textContent="📍 "+job.a;el.querySelector(".price").textContent="₹"+job.p;
+  el.querySelector(".tag").textContent=job.c;
+  return {el,left};
+}
+[40,340,160].forEach((s,i)=>{const j=make(pool[i],s);jobs.push(j);list.appendChild(j.el)});
+function render(){
+  jobs.forEach(j=>{
+    j.el.querySelector(".timer").textContent="⏱ "+fmt(j.left);
+    j.el.querySelector(".bar").style.width=(j.left/TOTAL*100)+"%";
+  });
+}
+render();
+setInterval(()=>{
+  jobs.forEach((j,i)=>{
+    j.left--;
+    if(j.left<=0){
+      const job=pool[next++%pool.length];
+      const n=make(job,TOTAL);
+      j.el.replaceWith(n.el);jobs[i]=n;
+    }
+  });
+  render();
+},1000);
+
+/* ---------- Categories ---------- */
+const cats={
+  "Cleaning":["Deep clean 2BHK flat","Sofa and carpet cleaning","Water tank cleaning"],
+  "Repair":["Fix ceiling fan","RO water purifier service","Washing machine repair"],
+  "Car Repair":["Car AC not cooling","Bike puncture repair","Car battery replacement"],
+  "Delivery":["Document pickup and drop","Grocery delivery to home","Medicine delivery urgent"],
+  "Moving":["House shifting help","Load and unload truck","Move heavy appliances"],
+  "Cooking":["Cook for family dinner","Daily tiffin service","Baking cake at home"],
+  "Driving":["Airport pickup and drop","School pick and drop","Monthly driver needed"],
+  "Gardening":["Lawn mowing service","Terrace garden setup","Tree pruning at home"],
+  "Painting":["Paint one room","Touch-up wall paint","Paint the main gate"],
+  "Construction":["Tile repair work","Waterproofing terrace","Ceiling leakage repair"],
+  "Tutoring":["Home tuition for class 8","Spoken English classes","Class 10 board exam prep"],
+  "Photography":["Birthday photography","Product photos for shop","Real estate photography"],
+  "Design":["Logo design for shop","Business card design","Shop banner design"],
+  "Writing":null,"Programming":null,"Marketing":null,"Beauty":null,"Fitness":null,
+  "Pet Care":null,"Babysitting":null,"Elder Care":null,"Event Help":null,
+  "Shopping":null,"Security":null,"Other":null
+};
+const chips=document.getElementById("chips"), ex=document.getElementById("examples");
+function show(name){
+  [...chips.children].forEach(b=>b.setAttribute("aria-pressed",b.textContent===name));
+  const items=cats[name];
+  ex.innerHTML="";
+  const b=document.createElement("b");b.textContent=name;ex.appendChild(b);
+  if(items){
+    const ul=document.createElement("ul");
+    items.forEach(i=>{const li=document.createElement("li");li.textContent=i;ul.appendChild(li)});
+    ex.appendChild(ul);
+  }else{
+    const p=document.createElement("p");p.style.cssText="margin-top:8px;color:#4b5563";
+    p.textContent="Post a "+name.toLowerCase()+" job and describe what you need.";
+    ex.appendChild(p);
+  }
+}
+Object.keys(cats).forEach(n=>{
+  const b=document.createElement("button");b.type="button";b.textContent=n;
+  b.setAttribute("aria-pressed","false");b.onclick=()=>show(n);chips.appendChild(b);
+});
+show("Cleaning");
+document.getElementById("yr").textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
